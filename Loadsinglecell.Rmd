@@ -1,0 +1,57 @@
+---
+title: "loadSingleCell"
+output: html_document
+date: "`r Sys.Date()`"
+---
+
+```{r setup, include=FALSE}
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("projectR")
+library(Seurat)
+library(projectR)
+Everything_merge_v6 <- readRDS("~/Downloads/Everything_merge_v6.rds")
+
+Everything_diet <- DietSeurat(object, counts = TRUE, data = TRUE, scale.data = FALSE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r plot}
+UMAPPlot(Everything_merge_v6, label=TRUE)
+UMAPPlot(Everything_merge_v6, group.by = "treatment")
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r project patterns}
+Everything_merge_v6_diet <- DietSeurat(Everything_merge_v6, layers= "scale.data")
+
+# Everything_merge_v6[["RNA"]] <- CreateAssayObject(counts = Everything_merge_v6[["RNA"]]@counts)
+# obj.list <- SplitObject(Everything_merge_v6, split.by = "ident")
+
+
+# convert a v5 assay to a v3 assay
+Everything_merge_v6[["RNA3"]] <- as(object = Everything_merge_v6[["RNA"]], Class = "Assay")
+
+# convert a v3 assay to a v5 assay
+Everything_merge_v6[["RNA5"]] <- as(object = Everything_merge_v6[["RNA"]], Class = "Assay5")
+
+DefaultAssay(object = Everything_merge_v6) <- "RNA5"
+
+Everything_merge_v6 <- UpdateSlots(Everything_merge_v6)
+epithelial <- subset(Everything_merge_v6, idents="Tumor")
+
+projectR(data=as.matrix(Everything_merge_v6@assays$RNA@counts),loadings=`cogapsresult (2)`)
+Everything_merge_v6_diet
+
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
